@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Web-App</title>
+  <link rel="icon" href="icon.png">
+
+  <link rel="stylesheet" href="css/main.css">
+
+</head>
+<body>
+
+  <input id="fileInput" type="file" onchange="getApp()">
+  <button onclick="openApp()"><img src="img/play.svg"><div id="selectAppText">Select App</div> <div id="createInstanceText">Create new App URL</div></button>
+  <small id="urlInfo">Once you select an app for this url, you will always get that app instead of this screen, so choose wisely, to add other apps use other urls.</small>
+
+  <script src="js/util.js"></script>
+  <script src="js/module/js-zip.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

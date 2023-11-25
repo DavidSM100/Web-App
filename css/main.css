@@ -1,0 +1,21 @@
+#fileInput {
+  display: none;
+}
+
+button {
+  color: #1670FE;
+  width: 25vw;
+  height: 25vw;
+  border: none;
+  border-radius: 10px;
+  font-size: 70%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+button img {
+  width: 50%;
+  height: 50%;
+}
