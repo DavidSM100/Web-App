@@ -4,7 +4,7 @@ This allows you to open web apps easily in your browser completely offline.
 ![Examples of apps](example-imgs/opened-apps.jpg)
 
 ## How to use ?
-Just run it over http localhost and open in the browser.
+Clone this project and run it over http localhost and open in the browser.
 
 You can run it using python like this:
 
