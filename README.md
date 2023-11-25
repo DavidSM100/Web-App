@@ -42,7 +42,7 @@ This will be useful to recognize easily every app in the browser since there wil
 ![Apps home screen shortcuts](example-imgs/screen-shortcuts.jpg)
 
 
-This app requires [serviceWorkers](https://developer.mozilla.org/en/docs/Web/API/Service_Worker_API) to work in your navigator where you open the apps.
+This app requires [ServiceWorkers](https://developer.mozilla.org/en/docs/Web/API/Service_Worker_API) to work in the navigator where you open the web apps.
 
 
 
