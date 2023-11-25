@@ -21,6 +21,11 @@ It is also allowed to use the url like this:
 Also you can put anything before "web-app" in case you need it for some reason.
 
 
+### Using the app
+Once you open the url in the browser the main app should open, you will be able to use it to create new windows (with new random urls), on each new window you will be able to select a .zip file (or .xdc in case of WebXDCs) from your device files, the zip must contain the web app content you want to open for this window/url.
+Once the selected web app is opened it will be accessible completely offline.
+So you can open as many new windows as you want and select a web app for each one, once you finish opening new windows you can close the http server.
+
 ## Notes
 
 This allows you to run [webXDCs](https://webxdc.org/) too!
@@ -35,6 +40,9 @@ This will be useful to recognize easily every app in the browser since there wil
 
 
 ![Apps home screen shortcuts](example-imgs/screen-shortcuts.jpg)
+
+
+This app requires [serviceWorkers](https://en.m.wikipedia.org/wiki/Service_worker) to work in your navigator where you open the apps.
 
 
 
