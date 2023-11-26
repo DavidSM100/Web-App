@@ -1,34 +1,55 @@
-// Get location and hostname where the app got opened
+// Get location and hostname
 var loc = window.location;
 var hostname = loc.hostname;
 
-// Hide text of the UI according to the hostname(if it is the main app hide some of them, if it is a url hide others)
-function hideTexts() {
-if (hostname === 'localhost' || hostname.endsWith('web-app.localhost')) {
- urlInfo.style.display = "none";
-  selectAppText.style.display = "none";
-} else {
-  createInstanceText.style.display = "none";
-}
-}
 
-hideTexts();
-
-
-//Check if one of the values of the array is exactly the same as the value specified.
-function ifArrayHas(value, array) {
-  var trueFalse = false;
-  for (var i = 0; i < array.length; i++) {
-    if (array[i] === value) {
-      trueFalse = true;
-      break;
-    }
+// Hide elements of the UI according to the hostname
+function hideUIElems() {
+  if (hostname === 'localhost' || hostname.endsWith('web-app.localhost')) {
+    playImg.style.display = "none";
+    selectText.style.display = "none";
+  } else {
+    plusImg.style.display = "none";
+    createText.style.display = "none";
   }
-  return trueFalse;
+}
+
+hideUIElems();
+
+// Register Service Worker
+async function registerServiceWorker () {
+  if ("serviceWorker" in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register("service-worker.js");
+
+      // Debugging
+      /*
+      if (registration.installing) {
+        console.log("Service worker installing");
+      } else if (registration.waiting) {
+        console.log("Service worker installed");
+      } else if (registration.active) {
+        console.log("Service worker active");
+      }
+      */
+      // Debugging
+
+    } catch (error) {
+      errorInfo.innerHTML = "error: " + error;
+    }
+  } else {
+    errorInfo.innerHTML = "error: Your browser does not support Service Workers";
+  }
 }
 
 
-//Get name of the app (if app has no manifest or doesn't has the name defined on it then the name will be the file name)
+//Check if one of the values of the array is exactly the same as the value specified
+function ifArrayHas(val, arr) {
+  return arr.some(v => v === val);
+}
+
+
+//Get name of the webXDC (if app has no manifest or doesn't has the name defined on it then the name will be the file name)
 async function getName(files, list, name) {
   var appName = name;
   var ifManifest = ifArrayHas("manifest.toml", list);
@@ -62,35 +83,51 @@ function getIcon(files, list) {
 }
 
 
+//Get a random number (1-1000000000)
+function getRandom() {
+  return Math.floor(Math.random() * 1000000000) + 1;
+}
+
+
 // Fetch url and put response in the cache
-async function addToCache(url) {
-  var cache = await caches.open("App-Cache-DataBase");
-  var response = await fetch(url);
+async function addToCache(url, cache) {
+  const response = await fetch(url);
   await cache.put(url, response);
   return;
 }
 
 
-// Inject title and icon to the app html
+// Inject title and icon and others to the html string
 function injectStuff(htmlString, name, iconName) {
   // Create new HTML document from the string
   var html = new DOMParser().parseFromString(htmlString,
     "text/html");
 
-// Add head if not exists
+  // Add head if not exists
   if (!html.head) {
     var head = html.createElement('head');
     html.appendChild(head);
   }
 
-// Add title if not exists
+
+
+  // Debugging
+  /* uncomment to link eruda.js to every app
+  var eruda = html.createElement('script');
+  eruda.src = "eruda.js";
+  html.head.insertBefore(eruda, html.head.firstChild);
+  */
+  // Debugging
+
+
+  // Add title if not exists
   if (!html.title) {
     var title = html.createElement('title');
     title.innerHTML = name;
     html.head.appendChild(title);
   }
 
-// Add link to icon
+  // Add icon link
   if (iconName !== "none") {
     var iconLink = html.createElement('link');
     iconLink.rel = "icon";
@@ -99,47 +136,59 @@ function injectStuff(htmlString, name, iconName) {
     html.head.insertBefore(iconLink, html.head.firstChild);
   }
 
-// Convert back to string
+  // Add meta "viewport"
+  var viewport = html.createElement('meta');
+  viewport.name = "viewport";
+  viewport.content = "width=device-width, initial-scale=1.0";
+  html.head.insertBefore(viewport, html.head.firstChild);
+
+  // Convert back to string
   var newHtml = html.documentElement.innerHTML;
 
   return newHtml;
 }
 
+// Get the mime type of the file using the file name
+function getMimeType(fileName) {
+  var type = "none";
+  const regex = /\.(.{1,8}?$)/
+  switch (fileName.match(regex)[1].toLowerCase()) {
+    case 'js':
+      type = 'text/javascript';
+      break;
+    case 'html':
+      type = 'text/html';
+      break;
+    case 'css':
+      type = 'text/css';
+      break;
+    case 'svg':
+      type = "image/svg+xml";
+      break;
+  }
+
+  return type;
+}
+
 
 // Create the file with the file data and the name
 function getFile(fileData, name) {
-  var type = "text/plain";
-  if (name.endsWith('.html')) {
-    type = "text/html";
-  } else if (name.endsWith('.css')) {
-    type = "text/css";
-  } else if (name.endsWith('.js')) {
-    type = "text/javascript";
-  } else if (name.endsWith('.svg')) {
-    type = "image/svg+xml";
+  var type = getMimeType(name);
+
+  var options = {};
+  if (type !== "none") {
+    options.type = type;
   }
 
-  const file = new File([fileData], name, {
-    type: type
-  });
+  const file = new File([fileData], name, options);
 
   return file;
 }
 
 
-//Get a random number (1-1000000000)
-function getRandom() {
-  return Math.floor(Math.random() * 1000000000) + 1;
-}
-
 
 // Create the file response
 function getResponse(file) {
-  const response = new Response(file, {
-    headers: {
-      "Content-Type": file.type,
-    },
-  });
-
+  const response = new Response(file);
   return response;
 }

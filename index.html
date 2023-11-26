@@ -1,23 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF8">
+
+  <!-- Debugging -->
+  <!--
+    <script src="eruda.js"></script>
+          -->
+  <!-- Debugging -->
+
+
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Title and Icon for this app -->
   <title>Web-App</title>
   <link rel="icon" href="icon.png">
 
+  <!-- Main CSS -->
   <link rel="stylesheet" href="css/main.css">
 
 </head>
 <body>
 
-  <input id="fileInput" type="file" onchange="getApp()">
-  <button onclick="openApp()"><img src="img/play.svg"><div id="selectAppText">Select App</div> <div id="createInstanceText">Create new App URL</div></button>
-  <small id="urlInfo">Once you select an app for this url, you will always get that app instead of this screen, so choose wisely, to add other apps use other urls.</small>
+  <!-- Getting the error infos here -->
+  <div id="errorInfo"></div>
 
+  <!-- Input to select the zip file with the web app content from the files system -->
+  <input id="fileInput" type="file" onchange="getApp()">
+
+  <!-- Button to open new url or select app from file system (depending on the current url) -->
+  <button onclick="openApp()">
+    <img id="plusImg" src="img/plus.svg">
+    <img id="playImg" src="img/play.svg">
+    <div id="selectText">
+      Select App
+    </div>
+    <div id="createText">
+      Create new App URL
+    </div>
+  </button>
+
+  <!-- Usefull JS -->
   <script src="js/util.js"></script>
+
+  <!-- JSZip (Working with zips) -->
   <script src="js/module/js-zip.js"></script>
+
+  <!-- Main JS -->
   <script src="js/main.js"></script>
 </body>
 </html>

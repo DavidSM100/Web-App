@@ -6,6 +6,7 @@ async function getResponse(fileUrl) {
   
   // Open Cache database
   var cache = await caches.open("App-Cache-DataBase");
+  
   // Getting cache item if there is a match
   var response = await cache.match(path);
   
@@ -18,6 +19,6 @@ async function getResponse(fileUrl) {
 
 // Fetch event, triggers everytime any kind of resource is fetched some how
 self.addEventListener("fetch", (event) => {
-  // Replacing the default respond with the cache response (in case the item it is in the cache)
+  // Replacing the default response with the response returned from getResponse() function
   event.respondWith(getResponse(event.request.url));
 });
