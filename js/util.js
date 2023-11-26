@@ -11,6 +11,7 @@ function hideUIElems() {
   } else {
     plusImg.style.display = "none";
     createText.style.display = "none";
+    title.innerHTML = "Select App";
   }
 }
 
