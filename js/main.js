@@ -1,90 +1,45 @@
-registerServiceWorker();
+const serviceWorkerPath = "./service-worker.js";
+const cacheName = "web-app-cache-db";
 
-// Create new link or select app according to hostname
-async function openApp() {
-  if (hostname === 'localhost' || hostname.endsWith('web-app.localhost')) {
+let page = window.location;
 
-    var randomNumber = getRandom();
-    var orig = window.origin;
-    var url = orig.replace(hostname, randomNumber + ".localhost") + "/index.html";
-    window.open(url);
+handleUI();
 
-  } else {
-    fileInput.click();
-  }
+let newAppBtn = document.getElementById("newAppBtn");
+let selectFileBtn = document.getElementById("selectFileBtn");
+let fileSelector = document.getElementById("fileInput");
+
+newAppBtn.addEventListener("click", openNewUrl);
+selectFileBtn.addEventListener("click", () => fileSelector.click());
+fileSelector.addEventListener("change", async function () {
+  let zip = this.files[0];
+  await registerApp(zip, serviceWorkerPath, cacheName);
+  page.reload();
+});
+
+function openNewUrl() {
+  let date = Date.now();
+  let appID = "web-app-" + date;
+
+  let hostname = page.hostname;
+  let origin = page.origin;
+
+  let newHostname = hostname.replace(hostname, appID + "." + hostname);
+  let url = origin.replace(hostname, newHostname);
+
+  window.open(url);
 }
 
+function handleUI() {
+  const urlRegex = /^web-app-[0-9]+\..+/;
+  let hostname = page.hostname;
 
-async function getApp() {
-  const selectedFile = fileInput.files[0];
-  const fileName = selectedFile.name;
+  let isCreatedUrl = urlRegex.test(hostname);
 
-  if (fileName.endsWith('.zip') || fileName.endsWith('.xdc')) {
-    const zip = JSZip();
-    const content = await zip.loadAsync(selectedFile);
-    const list = Object.keys(content.files);
-    const numbers = list.length;
-    const ifIndexHtml = ifArrayHas("index.html", list);
-
-    if (ifIndexHtml === true) {
-
-      const cache = await caches.open("App-Cache-DataBase");
-
-
-      // Debugging
-      /* uncomment to add the file eruda.js to every app
-      await addToCache("eruda.js", cache);
-      */
-      // Debugging
-
-
-      await addToCache("webxdc.js", cache);
-
-
-      var number = 0;
-
-      content.forEach(async function(path, fileObj) {
-        if (fileObj.dir) {
-          number += 1;
-
-          if (number === numbers) {
-            location.href = "index.html";
-          }
-
-        } else {
-          var fileData;
-          if (path === "index.html") {
-
-            const htmlString = await fileObj.async("string");
-            const name = await getName(content, list, fileName);
-            const iconName = getIcon(content, list);
-
-            fileData = injectStuff(htmlString, name, iconName);
-
-          } else {
-
-            fileData = await fileObj.async("blob");
-
-          }
-
-          const file = getFile(fileData, path);
-
-          const response = getResponse(file);
-          await cache.put(path, response);
-
-          number += 1;
-
-          if (number === numbers) {
-            location.href = "index.html";
-          }
-
-        }
-
-      });
-
-    }
-
-
+  if (isCreatedUrl) {
+    document.getElementById("newAppDiv").hidden = true;
+    document.title = "Select App";
+  } else {
+    document.getElementById("selectAppDiv").hidden = true;
   }
-
 }

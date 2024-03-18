@@ -1,24 +1,22 @@
-// Get the response to the url request
-async function getResponse(fileUrl) {
-  // Getting path for the url of the request
-  var url = new URL(fileUrl);
-  var path = url.pathname.replace('/', "");
-  
-  // Open Cache database
-  var cache = await caches.open("App-Cache-DataBase");
-  
-  // Getting cache item if there is a match
-  var response = await cache.match(path);
-  
-  // If the response it is in the cache then return it, else get it from the network
-  if (response) return response;
-  const networkResponse = await fetch(fileUrl);
-  return networkResponse;
-}
+const cacheName = "web-app-cache-db";
 
-
-// Fetch event, triggers everytime any kind of resource is fetched some how
 self.addEventListener("fetch", (event) => {
-  // Replacing the default response with the response returned from getResponse() function
-  event.respondWith(getResponse(event.request.url));
+  let url = event.request.url;
+  event.respondWith(getResponse(url));
 });
+
+async function getResponse(url) {
+  let cache = await caches.open(cacheName);
+
+  let path = new URL(url).pathname;
+  if (path == "/") path = "/index.html";
+
+  let filePath = path.replace("/", "");
+  let response = await cache.match(filePath);
+
+  if (response) return response;
+  else {
+    let networkResponse = await fetch(url);
+    return networkResponse;
+  }
+}
