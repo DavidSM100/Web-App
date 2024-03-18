@@ -2,8 +2,6 @@
 
 Web-App allows you to open web apps easily in your browser completely offline.
 
-![Examples of apps](example-imgs/opened-apps.jpg)
-
 ## How to use ?
 
 Clone this project and run it over http localhost and open in the browser.
