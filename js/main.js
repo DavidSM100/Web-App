@@ -1,25 +1,31 @@
 const serviceWorkerPath = "./service-worker.js";
 const cacheName = "web-app-cache-db";
 
+let $ = (id) => document.getElementById(id);
 let page = window.location;
 
 handleUI();
 
-let newAppBtn = document.getElementById("newAppBtn");
-let selectFileBtn = document.getElementById("selectFileBtn");
-let fileSelector = document.getElementById("fileInput");
+$("newAppBtn").addEventListener("click", openNewUrl);
+$("selectFileBtn").addEventListener("click", () => $("fileInput").click());
+$("fileInput").addEventListener("change", installApp);
 
-newAppBtn.addEventListener("click", openNewUrl);
-selectFileBtn.addEventListener("click", () => fileSelector.click());
-fileSelector.addEventListener("change", async function () {
-  let zip = this.files[0];
-  await registerApp(zip, serviceWorkerPath, cacheName);
-  page.reload();
-});
+function handleUI() {
+  const urlRegex = /^web-app-[0-9]+\..+/;
+  let hostname = page.hostname;
+
+  let isCreatedUrl = urlRegex.test(hostname);
+
+  if (isCreatedUrl) {
+    $("newAppDiv").hidden = true;
+    document.title = "Select App";
+  } else {
+    $("selectAppDiv").hidden = true;
+  }
+}
 
 function openNewUrl() {
-  let date = Date.now();
-  let appID = "web-app-" + date;
+  let appID = "web-app-" + Date.now();
 
   let hostname = page.hostname;
   let origin = page.origin;
@@ -30,16 +36,8 @@ function openNewUrl() {
   window.open(url);
 }
 
-function handleUI() {
-  const urlRegex = /^web-app-[0-9]+\..+/;
-  let hostname = page.hostname;
-
-  let isCreatedUrl = urlRegex.test(hostname);
-
-  if (isCreatedUrl) {
-    document.getElementById("newAppDiv").hidden = true;
-    document.title = "Select App";
-  } else {
-    document.getElementById("selectAppDiv").hidden = true;
-  }
+async function installApp() {
+  let zip = this.files[0];
+  await registerApp(zip, serviceWorkerPath, cacheName);
+  page.reload();
 }

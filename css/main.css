@@ -7,10 +7,13 @@ button {
   color: #1670fe;
   padding-top: 10px;
   padding-bottom: 10px;
+  border: 1px solid #1670fe;
   border-left: none;
   border-right: none;
-  border-width: 1px;
-  border-color: #1670fe;
+}
+
+button:hover, button:focus, button:active {
+  background-color: #ddd;
 }
 
 img {
