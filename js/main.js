@@ -1,43 +1,73 @@
-const serviceWorkerPath = "./service-worker.js";
-const cacheName = "web-app-cache-db";
+const $ = (id) => document.getElementById(id);
+const isCreatedUrl = location.hostname.startsWith("webapp-");
 
-let $ = (id) => document.getElementById(id);
-let page = window.location;
-
-handleUI();
-
-$("newAppBtn").addEventListener("click", openNewUrl);
-$("selectFileBtn").addEventListener("click", () => $("fileInput").click());
-$("fileInput").addEventListener("change", installApp);
-
-function handleUI() {
-  const urlRegex = /^web-app-[0-9]+\..+/;
-  let hostname = page.hostname;
-
-  let isCreatedUrl = urlRegex.test(hostname);
-
+load();
+async function load() {
   if (isCreatedUrl) {
-    $("newAppDiv").hidden = true;
-    document.title = "Select App";
+    const params = new URLSearchParams(location.hash.substring(1));
+    const zipUrl = params.get("url");
+    if (zipUrl) {
+      $("info").textContent = "Downloading file...";
+      $("info").hidden = false;
+      try {
+        const file = await (await fetch(zipUrl)).blob();
+        $("info").textContent = "Installing zip...";
+        const type = (zipUrl.endsWith(".xdc") && "xdc") || null;
+        await installApp(file, type);
+        location.hash = "";
+        location.reload();
+      } catch (err) {
+        console.log(err);
+        alert(err);
+      }
+    } else {
+      $("file-import").hidden = false;
+      $("file-input").addEventListener("change", async (e) => {
+        const file = e.currentTarget.files[0];
+        if (!file) return;
+        try {
+          $("file-import").hidden = true;
+          $("info").textContent = "Installing zip...";
+          $("info").hidden = false;
+          const type = (file.name.endsWith(".xdc") && "xdc") || null;
+          await installApp(file, type);
+          location.reload();
+        } catch (err) {
+          console.log(err);
+          alert(err);
+        }
+      });
+    }
   } else {
-    $("selectAppDiv").hidden = true;
+    $("newAppDiv").hidden = false;
+    $("newAppBtn").addEventListener("click", openNewUrl);
   }
 }
 
 function openNewUrl() {
-  let appID = "web-app-" + Date.now();
-
-  let hostname = page.hostname;
-  let origin = page.origin;
-
-  let newHostname = hostname.replace(hostname, appID + "." + hostname);
-  let url = origin.replace(hostname, newHostname);
-
-  window.open(url);
+  const appID = "webapp-" + Date.now();
+  const newHostname = appID + "." + location.hostname;
+  const url = location.origin.replace(location.hostname, newHostname);
+  const link = document.createElement("a");
+  link.target = "_blank";
+  link.href = url;
+  document.body.append(link);
+  link.click();
+  link.remove();
 }
 
-async function installApp() {
-  let zip = this.files[0];
-  await registerApp(zip, serviceWorkerPath, cacheName);
-  page.reload();
+/**
+ *
+ * @param {string} url
+ * @param {string | null} type
+ * @param {any[] | null} extraAssets
+ */
+async function installApp(file, type, extraAssets) {
+  extraAssets = extraAssets || [];
+  if (type === "xdc") {
+    const webxdcJs = await (await fetch("/webxdc.js")).blob();
+    extraAssets.push({ path: "/webxdc.js", file: webxdcJs });
+  }
+  await saveApp(file, extraAssets);
+  await registerServiceWorker();
 }

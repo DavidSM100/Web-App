@@ -11,8 +11,7 @@ async function getResponse(url) {
   let path = new URL(url).pathname;
   if (path == "/") path = "/index.html";
 
-  let filePath = path.replace("/", "");
-  let response = await cache.match(filePath);
+  let response = await cache.match(path);
 
   if (response) return response;
   else {

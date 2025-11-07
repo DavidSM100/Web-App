@@ -1,35 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
 
-    <title>Web-App</title>
-    <link rel="icon" href="./icon.png" />
+    <title>Web-App Runner</title>
+    <link rel="icon" href="icon.png" />
 
-    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="main.css" />
   </head>
   <body>
-    <input id="fileInput" type="file" hidden />
+    <div class="container">
+      <div id="newAppDiv" hidden>
+        <button id="newAppBtn">Create new URL</button>
+      </div>
 
-    <div id="newAppDiv">
-      <h3 align="center">New App</h3>
-      <button id="newAppBtn">
-        <img src="./imgs/plus.svg" />
-        Create new URL
-      </button>
+      <div id="file-import" hidden>
+        <label class="file-import-label">
+          Click or drag to import files
+          <input type="file" id="file-input" />
+        </label>
+      </div>
+
+      <div id="info" hidden></div>
     </div>
 
-    <div id="selectAppDiv">
-      <h3 align="center">Select App</h3>
-      <button id="selectFileBtn">
-        <img src="./imgs/file.svg" />
-        Select File
-      </button>
-    </div>
-
-    <script src="./js/jszip.min.js"></script>
-    <script src="./js/register-app.js"></script>
-    <script src="./js/main.js"></script>
+    <script src="js/jszip.min.js"></script>
+    <script src="js/register-app.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>

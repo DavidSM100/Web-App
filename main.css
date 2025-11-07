@@ -1,0 +1,42 @@
+html,
+body {
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+button {
+  padding: 40px 60px;
+  font-size: large;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.info {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+}
+
+.file-import-label {
+  padding: 40px 60px;
+  border: 2px dashed #aaa;
+  border-radius: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  text-align: center;
+  cursor: pointer;
+}
+
+.file-import-label input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
