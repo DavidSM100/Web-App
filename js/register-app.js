@@ -1,4 +1,4 @@
-const cacheName = "web-app-cache-db";
+const dbName = "__webapp-assets-db";
 const serviceWorkerPath = "/service-worker.js";
 
 /**
@@ -11,22 +11,20 @@ async function saveApp(zip, extraAssets) {
   if (!zipData.files["index.html"]) {
     throw new Error("No 'index.html' found.");
   }
-  const cache = await caches.open(cacheName);
+  const db = localforage.createInstance({ name: dbName });
   for (const fileObj of Object.values(zipData.files)) {
     if (fileObj.dir) continue;
     const path = "/" + fileObj.name;
     const blob = await fileObj.async("blob");
     const mimetype = getMimeType(fileObj.name);
-    const response = new Response(blob, {
-      headers: { "Content-Type": mimetype },
-    });
-    await cache.put(path, response);
+    const file = new File([blob], fileObj.name, { type: mimetype });
+    await db.setItem(path, file);
   }
 
   if (extraAssets) {
     for (const { path, file } of extraAssets) {
       if (path && file) {
-        await cache.put(path, new Response(file));
+        await db.setItem(path, file);
       }
     }
   }
