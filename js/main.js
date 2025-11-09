@@ -10,7 +10,50 @@ async function load() {
       $("info").textContent = "Downloading file...";
       $("info").hidden = false;
       try {
-        const file = await (await fetch(zipUrl)).blob();
+        const response = await fetch(zipUrl);
+        if (!response.ok) {
+          throw new Error(
+            response.statusText + ", " + "Error code: " + response.status
+          );
+        }
+
+        let contentLength;
+        if (response.headers.get("content-length")) {
+          contentLength = response.headers.get("content-length");
+        }
+
+        let file;
+        if (!contentLength) {
+          file = await response.blob();
+        } else {
+          const reader = response.body.getReader();
+          let received = 0;
+          let chunks = [];
+          let loading = true;
+          $("progress-container").hidden = false;
+          while (loading) {
+            const { done, value } = await reader.read();
+            if (done) {
+              loading = false;
+              $("progress-container").hidden = true;
+            } else {
+              received += value.length;
+              chunks.push(value);
+              const percent = received / contentLength * 100;
+              $("progress").value = percent;
+              $("progress").textContent = percent.toFixed(0) + "%";
+            }
+          }
+
+          file = new Uint8Array(received);
+          let position = 0;
+          for (const chunk of chunks) {
+            file.set(chunk, position);
+            position += chunk.length;
+          }
+
+        }
+
         $("info").textContent = "Installing zip...";
         const type = (zipUrl.endsWith(".xdc") && "xdc") || null;
         await installApp(file, type);
