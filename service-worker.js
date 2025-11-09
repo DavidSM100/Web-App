@@ -4,16 +4,18 @@ const dbName = "__webapp-assets-db";
 const db = localforage.createInstance({ name: dbName });
 
 self.addEventListener("fetch", (event) => {
-  const url = event.request.url;
-  event.respondWith(getResponse(url));
+  if (event.request.method !== "GET") return;
+  event.respondWith(getResponse(event.request));
 });
 
-async function getResponse(url) {
-  let path = new URL(url).pathname;
-  if (path === "/") path = "/index.html";
-
-  const asset = await db.getItem(path);
-
+/**
+ *
+ * @param {Request} request
+ */
+async function getResponse(request) {
+  const url = new URL(request.url);
+  url.hash = "";
+  const asset = await db.getItem(url.toString());
   if (asset) {
     return new Response(asset.body, { headers: asset.headers });
   } else {

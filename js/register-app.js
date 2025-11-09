@@ -16,16 +16,23 @@ async function saveApp(zip, extraAssets) {
     if (fileObj.dir) continue;
     const path = "/" + fileObj.name;
     const blob = await fileObj.async("blob");
-    await db.setItem(path, {
+    const url = new URL(path, location.origin);
+    const responseData = {
       body: blob,
       headers: { "Content-Type": lookupMimetype(path) },
-    });
+    };
+    await db.setItem(url.toString(), responseData);
+    if (path === "/index.html") {
+      url.pathname = "/";
+      await db.setItem(url.toString(), responseData);
+    }
   }
 
   if (extraAssets) {
     for (const { path, file } of extraAssets) {
       if (path && file) {
-        await db.setItem(path, {
+        const url = new URL(path, location.origin);
+        await db.setItem(url.toString(), {
           body: file,
           headers: { "Content-Type": lookupMimetype(path) },
         });
