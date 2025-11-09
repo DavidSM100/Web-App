@@ -16,15 +16,19 @@ async function saveApp(zip, extraAssets) {
     if (fileObj.dir) continue;
     const path = "/" + fileObj.name;
     const blob = await fileObj.async("blob");
-    const mimetype = getMimeType(fileObj.name);
-    const file = new File([blob], fileObj.name, { type: mimetype });
-    await db.setItem(path, file);
+    await db.setItem(path, {
+      body: blob,
+      headers: { "Content-Type": lookupMimetype(path) },
+    });
   }
 
   if (extraAssets) {
     for (const { path, file } of extraAssets) {
       if (path && file) {
-        await db.setItem(path, file);
+        await db.setItem(path, {
+          body: file,
+          headers: { "Content-Type": lookupMimetype(path) },
+        });
       }
     }
   }
@@ -39,23 +43,5 @@ async function registerServiceWorker() {
     }
   } else {
     alert("Error: Your browser does not support Service Workers");
-  }
-}
-
-/**
- *
- * @param {string} fileName
- */
-function getMimeType(fileName) {
-  if (fileName.endsWith(".js")) {
-    return "text/javascript";
-  } else if (fileName.endsWith(".html")) {
-    return "text/html";
-  } else if (fileName.endsWith(".css")) {
-    return "text/css";
-  } else if (fileName.endsWith(".svg")) {
-    return "image/svg+xml";
-  } else if (fileName.endsWith(".wasm")) {
-    return "application/wasm";
   }
 }

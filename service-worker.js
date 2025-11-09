@@ -15,7 +15,7 @@ async function getResponse(url) {
   const asset = await db.getItem(path);
 
   if (asset) {
-    return new Response(asset);
+    return new Response(asset.body, { headers: asset.headers });
   } else {
     const networkResponse = await fetch(url);
     return networkResponse;
