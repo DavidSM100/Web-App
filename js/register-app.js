@@ -44,8 +44,23 @@ async function saveApp(zip, extraAssets) {
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     try {
-      await navigator.serviceWorker.register(serviceWorkerPath);
+      const registration = await navigator.serviceWorker.register(
+        serviceWorkerPath
+      );
+      if (registration.active) {
+        return;
+      }
+
+      await new Promise((resolve) => {
+        const interval = setInterval(() => {
+          if (registration.active) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, 100);
+      });
     } catch (err) {
+      console.log(err);
       alert(`Error while registering the service worker:\n${err}`);
     }
   } else {
